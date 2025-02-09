@@ -2,8 +2,16 @@
 import { Building2, Cpu, Globe, Shield } from 'lucide-react';
 import { MarketDataStream } from '@/components/MarketDataStream';
 import { FeatureCard } from '@/components/FeatureCard';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
+  const navigate = useNavigate();
+
+  const handleEnterMarket = () => {
+    navigate('/dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-cyberDark text-white">
       {/* Hero Section */}
@@ -24,9 +32,12 @@ const Index = () => {
             <p className="text-xl text-white/70 max-w-2xl mx-auto mb-8">
               Welcome to the next generation of financial metaverse experiences. Trade, compete, and dominate in a cyberpunk world where every decision shapes the market.
             </p>
-            <button className="px-8 py-3 rounded-lg bg-neonPurple text-white font-semibold hover:bg-neonPurple/80 transition-colors duration-300 animate-glow">
+            <Button 
+              onClick={handleEnterMarket}
+              className="px-8 py-3 rounded-lg bg-neonPurple text-white font-semibold hover:bg-neonPurple/80 transition-colors duration-300 animate-glow"
+            >
               Enter NeoMarket
-            </button>
+            </Button>
           </div>
           
           <MarketDataStream />
