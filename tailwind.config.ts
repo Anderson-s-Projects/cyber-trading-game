@@ -20,15 +20,15 @@ export default {
     },
     extend: {
       colors: {
-        neonblue: "#00f0ff",
-        neonpink: "#ff0099",
-        cyberspace: "#0a0b0f",
-        cybersilver: "#8892b0",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        neonPurple: "#8B5CF6",
+        neonCyan: "#0EA5E9",
+        neonOrange: "#F97316",
+        cyberDark: "#1A1F2C",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -59,30 +59,33 @@ export default {
         },
       },
       keyframes: {
-        "neon-pulse": {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "glow": {
           "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.7" },
+          "50%": { opacity: "0.5" },
         },
-        "cyber-slide": {
-          "0%": { transform: "translateX(-100%)", opacity: "0" },
-          "100%": { transform: "translateX(0)", opacity: "1" },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
         },
-        "matrix-fade": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
+        "data-stream": {
+          "0%": { transform: "translateY(0)" },
+          "100%": { transform: "translateY(-50%)" },
         },
       },
       animation: {
-        "neon-pulse": "neon-pulse 2s ease-in-out infinite",
-        "cyber-slide": "cyber-slide 0.5s ease-out forwards",
-        "matrix-fade": "matrix-fade 0.3s ease-out forwards",
-      },
-      fontFamily: {
-        grotesk: ["Space Grotesk", "sans-serif"],
-        inter: ["Inter", "sans-serif"],
-      },
-      backdropBlur: {
-        xs: "2px",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "glow": "glow 2s ease-in-out infinite",
+        "float": "float 6s ease-in-out infinite",
+        "data-stream": "data-stream 20s linear infinite",
       },
     },
   },
