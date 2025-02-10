@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          conditions: Json | null
+          created_at: string
+          description: string
+          id: string
+          name: string
+          reward_xp: number | null
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string
+          description: string
+          id?: string
+          name: string
+          reward_xp?: number | null
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          reward_xp?: number | null
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -586,6 +613,32 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achieved_at: string
+          achievement_id: string
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string
+          achievement_id: string
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string
+          achievement_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_nfts: {
         Row: {
           nft_id: string
@@ -637,6 +690,39 @@ export type Database = {
           id?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          achievements: Json | null
+          avatar_url: string | null
+          created_at: string
+          experience_points: number | null
+          id: string
+          level: number | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          achievements?: Json | null
+          avatar_url?: string | null
+          created_at?: string
+          experience_points?: number | null
+          id: string
+          level?: number | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          achievements?: Json | null
+          avatar_url?: string | null
+          created_at?: string
+          experience_points?: number | null
+          id?: string
+          level?: number | null
+          updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }

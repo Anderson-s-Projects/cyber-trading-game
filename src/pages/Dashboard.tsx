@@ -3,6 +3,7 @@ import { PortfolioCard } from '@/components/PortfolioCard';
 import { MarketChart } from '@/components/MarketChart';
 import { QuickActions } from '@/components/QuickActions';
 import { MarketDataStream } from '@/components/MarketDataStream';
+import { AchievementsList } from '@/components/achievements/AchievementsList';
 
 const Dashboard = () => {
   return (
@@ -30,6 +31,10 @@ const Dashboard = () => {
             <MarketDataStream />
           </div>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <AchievementsList />
       </div>
     </div>
   );
