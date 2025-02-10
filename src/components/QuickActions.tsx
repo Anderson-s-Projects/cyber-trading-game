@@ -1,17 +1,28 @@
 
 import React from 'react';
-import { Plus, TrendingUp, Send, History, Minus } from 'lucide-react';
+import { Plus, TrendingUp, Send, History } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const actions = [
   { icon: Plus, label: 'Buy', color: 'text-green-400', action: 'buy' },
-  { icon: Minus, label: 'Sell', color: 'text-red-400', action: 'sell' },
   { icon: TrendingUp, label: 'Trade', color: 'text-neonblue', action: 'trade' },
   { icon: Send, label: 'Transfer', color: 'text-neonpink', action: 'transfer' },
   { icon: History, label: 'History', color: 'text-purple-400', action: 'history' },
+];
+
+// Popular tech stocks for paper trading
+const availableStocks = [
+  { symbol: 'AAPL', name: 'Apple Inc.' },
+  { symbol: 'MSFT', name: 'Microsoft Corporation' },
+  { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+  { symbol: 'AMZN', name: 'Amazon.com Inc.' },
+  { symbol: 'NVDA', name: 'NVIDIA Corporation' },
+  { symbol: 'META', name: 'Meta Platforms Inc.' },
+  { symbol: 'TSLA', name: 'Tesla Inc.' },
 ];
 
 interface Transaction {
@@ -25,6 +36,7 @@ interface Transaction {
 export const QuickActions = () => {
   const { toast } = useToast();
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
+  const [selectedStock, setSelectedStock] = React.useState<string>('');
 
   const handleTransaction = (type: string, formData: FormData) => {
     const symbol = formData.get('symbol') as string;
@@ -75,11 +87,34 @@ export const QuickActions = () => {
     return (
       <form
         className="space-y-4"
-        action={(formData) => handleTransaction(type, formData)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleTransaction(type, new FormData(e.currentTarget));
+        }}
       >
         <div className="space-y-2">
-          <label className="text-sm font-medium">Symbol</label>
-          <Input name="symbol" placeholder="NVDA" required />
+          <label className="text-sm font-medium">Stock Symbol</label>
+          <Select
+            value={selectedStock}
+            onValueChange={(value) => setSelectedStock(value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a stock" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableStocks.map((stock) => (
+                <SelectItem key={stock.symbol} value={stock.symbol}>
+                  {stock.symbol} - {stock.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            name="symbol"
+            type="hidden"
+            value={selectedStock}
+            readOnly
+          />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Amount</label>
@@ -97,7 +132,7 @@ export const QuickActions = () => {
   };
 
   return (
-    <div className="grid grid-cols-5 gap-4">
+    <div className="grid grid-cols-4 gap-4">
       {actions.map(({ icon: Icon, label, color, action }) => (
         <Dialog key={label}>
           <DialogTrigger asChild>
