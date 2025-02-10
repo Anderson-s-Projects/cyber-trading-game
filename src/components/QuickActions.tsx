@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from '@/integrations/supabase/client';
 
 const actions = [
   { icon: Plus, label: 'Buy', color: 'text-green-400', action: 'buy' },
@@ -37,6 +38,41 @@ export const QuickActions = () => {
   const { toast } = useToast();
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   const [selectedStock, setSelectedStock] = React.useState<string>('');
+  const [currentPrice, setCurrentPrice] = React.useState<string>('');
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const fetchStockPrice = async (symbol: string) => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase.functions.invoke('get-stock-price', {
+        body: { symbol }
+      });
+
+      if (error) throw error;
+      
+      if (data.price) {
+        setCurrentPrice(data.price.toFixed(2));
+      }
+    } catch (error) {
+      console.error('Error fetching stock price:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch stock price. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStockSelection = (value: string) => {
+    setSelectedStock(value);
+    if (value) {
+      fetchStockPrice(value);
+    } else {
+      setCurrentPrice('');
+    }
+  };
 
   const handleTransaction = (type: string, formData: FormData) => {
     const symbol = formData.get('symbol') as string;
@@ -96,7 +132,7 @@ export const QuickActions = () => {
           <label className="text-sm font-medium">Stock Symbol</label>
           <Select
             value={selectedStock}
-            onValueChange={(value) => setSelectedStock(value)}
+            onValueChange={handleStockSelection}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a stock" />
@@ -122,7 +158,14 @@ export const QuickActions = () => {
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Price (USD)</label>
-          <Input name="price" type="number" placeholder="100.00" required />
+          <Input 
+            name="price" 
+            type="number" 
+            value={currentPrice}
+            onChange={(e) => setCurrentPrice(e.target.value)}
+            placeholder={isLoading ? "Loading..." : "Price"}
+            required 
+          />
         </div>
         <Button type="submit" className="w-full">
           Confirm {type.charAt(0).toUpperCase() + type.slice(1)}
