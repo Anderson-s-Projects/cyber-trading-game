@@ -437,6 +437,47 @@ export type Database = {
           },
         ]
       }
+      stock_transactions: {
+        Row: {
+          id: string
+          portfolio_id: string | null
+          price_per_share: number
+          quantity: number
+          symbol: string
+          total_amount: number | null
+          transaction_date: string | null
+          transaction_type: string
+        }
+        Insert: {
+          id?: string
+          portfolio_id?: string | null
+          price_per_share: number
+          quantity: number
+          symbol: string
+          total_amount?: number | null
+          transaction_date?: string | null
+          transaction_type: string
+        }
+        Update: {
+          id?: string
+          portfolio_id?: string | null
+          price_per_share?: number
+          quantity?: number
+          symbol?: string
+          total_amount?: number | null
+          transaction_date?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_transactions_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "user_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_nft_rewards: {
         Row: {
           nft_id: string
@@ -574,6 +615,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_portfolios: {
+        Row: {
+          cash_balance: number | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cash_balance?: number | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cash_balance?: number | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_tokens: {
         Row: {
@@ -737,7 +802,23 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      portfolio_holdings: {
+        Row: {
+          portfolio_id: string | null
+          symbol: string | null
+          total_invested: number | null
+          total_shares: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_transactions_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "user_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
