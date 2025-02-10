@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const FINNHUB_API_KEY = Deno.env.get('FINNHUB_API_KEY') || Deno.env.get('finhub')
+const FINNHUB_API_KEY = Deno.env.get('FINNHUB_API_KEY')
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,11 +25,9 @@ serve(async (req) => {
     console.log('Debug Info:')
     console.log('- Symbol:', symbol)
     console.log('- API Key exists:', !!FINNHUB_API_KEY)
-    console.log('- API Key length:', FINNHUB_API_KEY?.length)
-    console.log('- API Key first 4 chars:', FINNHUB_API_KEY?.substring(0, 4))
     
     if (!FINNHUB_API_KEY) {
-      throw new Error('Finnhub API key is not configured. Please check both FINNHUB_API_KEY and finhub environment variables.')
+      throw new Error('Finnhub API key is not configured')
     }
 
     console.log('Attempting to fetch data from Finnhub API...')
