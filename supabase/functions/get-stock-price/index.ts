@@ -21,14 +21,18 @@ serve(async (req) => {
       throw new Error('Stock symbol is required')
     }
 
-    // Add logging to debug the API key
-    console.log('Checking API key availability:', !!FINNHUB_API_KEY)
+    // Add detailed logging for debugging
+    console.log('Debug Info:')
+    console.log('- Symbol:', symbol)
+    console.log('- API Key exists:', !!FINNHUB_API_KEY)
+    console.log('- API Key length:', FINNHUB_API_KEY?.length)
+    console.log('- API Key first 4 chars:', FINNHUB_API_KEY?.substring(0, 4))
     
     if (!FINNHUB_API_KEY) {
       throw new Error('Finnhub API key is not configured')
     }
 
-    console.log(`Fetching price for ${symbol}`)
+    console.log('Attempting to fetch data from Finnhub API...')
     
     const response = await fetch(
       `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`
@@ -36,8 +40,11 @@ serve(async (req) => {
     
     const data = await response.json()
     
+    // Log the Finnhub API response for debugging
+    console.log('Finnhub API Response:', data)
+    
     if (data.error) {
-      throw new Error(data.error)
+      throw new Error(`Finnhub API error: ${data.error}`)
     }
 
     return new Response(
@@ -45,7 +52,11 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Error fetching stock price:', error)
+    console.error('Detailed error:', {
+      message: error.message,
+      stack: error.stack,
+    })
+    
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
