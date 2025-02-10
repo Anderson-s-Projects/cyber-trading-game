@@ -21,6 +21,13 @@ serve(async (req) => {
       throw new Error('Stock symbol is required')
     }
 
+    // Add logging to debug the API key
+    console.log('Checking API key availability:', !!FINNHUB_API_KEY)
+    
+    if (!FINNHUB_API_KEY) {
+      throw new Error('Finnhub API key is not configured')
+    }
+
     console.log(`Fetching price for ${symbol}`)
     
     const response = await fetch(
