@@ -46,8 +46,8 @@ export const MarketChart = () => {
       },
     });
 
-    // Create line series using the correct method
-    const series = chart.addLineSeries({
+    // Create series using the correct method addSeries
+    const series = chart.addSeries('line', {
       color: '#2962FF',
       lineWidth: 2,
       crosshairMarkerVisible: true,
