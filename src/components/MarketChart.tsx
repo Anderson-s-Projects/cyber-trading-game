@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { createChart, ColorType } from 'lightweight-charts';
+import { createChart } from 'lightweight-charts';
 import { availableStocks } from '@/constants/stockData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -47,7 +47,7 @@ export const MarketChart = () => {
     });
 
     // Create series with the correct method
-    const series = chart.addLineSeries({
+    const series = chart.addSeries('line', {
       color: '#00f0ff',
       lineWidth: 2,
       crosshairMarkerVisible: true,
