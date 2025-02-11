@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { IChartApi, createChart } from 'lightweight-charts';
+import { IChartApi, createChart, SeriesOptionsMap } from 'lightweight-charts';
 import { availableStocks } from '@/constants/stockData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -46,13 +46,16 @@ export const MarketChart = () => {
       },
     });
 
-    // Create series using the correct method addSeries
-    const series = chart.addSeries('line', {
-      color: '#2962FF',
+    // Create series using the correct method and type
+    const series = chart.addBaselineSeries({
+      baseValue: { type: 'price', price: 0 },
+      topLineColor: '#2962FF',
+      topFillColor1: 'rgba(41, 98, 255, 0.28)',
+      topFillColor2: 'rgba(41, 98, 255, 0.05)',
+      bottomLineColor: '#FF2962',
+      bottomFillColor1: 'rgba(255, 41, 98, 0.28)',
+      bottomFillColor2: 'rgba(255, 41, 98, 0.05)',
       lineWidth: 2,
-      crosshairMarkerVisible: true,
-      lastValueVisible: true,
-      priceLineVisible: false,
     });
 
     // Generate some sample data
