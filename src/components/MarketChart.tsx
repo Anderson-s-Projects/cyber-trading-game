@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { IChartApi, createChart, SeriesOptionsMap } from 'lightweight-charts';
+import { IChartApi, createChart } from 'lightweight-charts';
 import { availableStocks } from '@/constants/stockData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -46,32 +46,35 @@ export const MarketChart = () => {
       },
     });
 
-    // Create series using the correct method and type
-    const series = chart.addBaselineSeries({
-      baseValue: { type: 'price', price: 0 },
-      topLineColor: '#2962FF',
-      topFillColor1: 'rgba(41, 98, 255, 0.28)',
-      topFillColor2: 'rgba(41, 98, 255, 0.05)',
-      bottomLineColor: '#FF2962',
-      bottomFillColor1: 'rgba(255, 41, 98, 0.28)',
-      bottomFillColor2: 'rgba(255, 41, 98, 0.05)',
-      lineWidth: 2,
+    // Create area series
+    const areaSeries = chart.addCandlestickSeries({
+      upColor: '#26a69a',
+      downColor: '#ef5350',
+      wickUpColor: '#26a69a',
+      wickDownColor: '#ef5350',
+      borderVisible: false,
     });
 
-    // Generate some sample data
+    // Generate some sample data with OHLC format
     const currentDate = new Date();
     const sampleData = Array.from({ length: 50 }, (_, i) => {
       const date = new Date(currentDate);
       date.setDate(date.getDate() - i);
       const basePrice = 100 + Math.random() * 50;
+      const high = basePrice + Math.random() * 10;
+      const low = basePrice - Math.random() * 10;
+      
       return {
         time: date.toISOString().split('T')[0],
-        value: basePrice + (Math.random() - 0.5) * 20,
+        open: basePrice,
+        high: high,
+        low: low,
+        close: basePrice + (Math.random() - 0.5) * 20,
       };
     }).reverse();
 
     setCandleData(sampleData);
-    series.setData(sampleData);
+    areaSeries.setData(sampleData);
     chartRef.current = chart;
 
     // Handle resize
