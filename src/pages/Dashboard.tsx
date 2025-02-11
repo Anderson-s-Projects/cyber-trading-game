@@ -4,6 +4,7 @@ import { MarketChart } from '@/components/MarketChart';
 import { QuickActions } from '@/components/QuickActions';
 import { MarketDataStream } from '@/components/MarketDataStream';
 import { AchievementsList } from '@/components/achievements/AchievementsList';
+import { CareerStatus } from '@/components/career/CareerStatus';
 
 const Dashboard = () => {
   return (
@@ -30,6 +31,7 @@ const Dashboard = () => {
             <h3 className="text-xl font-grotesk mb-4 text-neonCyan">Live Market Feed</h3>
             <MarketDataStream />
           </div>
+          <CareerStatus />
         </div>
       </div>
 

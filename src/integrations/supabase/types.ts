@@ -36,6 +36,45 @@ export type Database = {
         }
         Relationships: []
       }
+      career_achievements: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          name: string
+          reputation_requirement: number | null
+          required_level: Database["public"]["Enums"]["career_level"] | null
+          required_path: Database["public"]["Enums"]["career_path"] | null
+          reward_reputation: number
+          reward_xp: number
+          technical_skill_requirement: number | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          name: string
+          reputation_requirement?: number | null
+          required_level?: Database["public"]["Enums"]["career_level"] | null
+          required_path?: Database["public"]["Enums"]["career_path"] | null
+          reward_reputation?: number
+          reward_xp?: number
+          technical_skill_requirement?: number | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          reputation_requirement?: number | null
+          required_level?: Database["public"]["Enums"]["career_level"] | null
+          required_path?: Database["public"]["Enums"]["career_path"] | null
+          reward_reputation?: number
+          reward_xp?: number
+          technical_skill_requirement?: number | null
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -639,6 +678,71 @@ export type Database = {
           },
         ]
       }
+      user_career_achievements: {
+        Row: {
+          achieved_at: string
+          achievement_id: string
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string
+          achievement_id: string
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string
+          achievement_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_career_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "career_achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_careers: {
+        Row: {
+          created_at: string
+          current_level: Database["public"]["Enums"]["career_level"]
+          current_path: Database["public"]["Enums"]["career_path"]
+          heat_level: number
+          id: string
+          network_size: number
+          reputation_score: number
+          technical_skills: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_level?: Database["public"]["Enums"]["career_level"]
+          current_path?: Database["public"]["Enums"]["career_path"]
+          heat_level?: number
+          id?: string
+          network_size?: number
+          reputation_score?: number
+          technical_skills?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_level?: Database["public"]["Enums"]["career_level"]
+          current_path?: Database["public"]["Enums"]["career_path"]
+          heat_level?: number
+          id?: string
+          network_size?: number
+          reputation_score?: number
+          technical_skills?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_nfts: {
         Row: {
           nft_id: string
@@ -910,7 +1014,18 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      career_level:
+        | "retail_trader"
+        | "professional_trader"
+        | "fund_manager"
+        | "investment_bank_owner"
+        | "market_maker"
+        | "street_hustler"
+        | "market_manipulator"
+        | "inside_trader"
+        | "crime_syndicate_leader"
+        | "market_kingpin"
+      career_path: "legitimate" | "criminal"
     }
     CompositeTypes: {
       [_ in never]: never
