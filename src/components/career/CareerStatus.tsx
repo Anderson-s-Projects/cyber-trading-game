@@ -133,3 +133,6 @@ export const CareerStatus = () => {
     </Card>
   );
 };
+
+// Add a default export as well for better module compatibility
+export default CareerStatus;
