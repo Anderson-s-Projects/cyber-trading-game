@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { createChart } from 'lightweight-charts';
+import { createChart, SeriesType } from 'lightweight-charts';
 import { availableStocks } from '@/constants/stockData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -47,7 +47,7 @@ export const MarketChart = () => {
     });
 
     // Create series using the correct method
-    const lineSeries = chart.addLineSeries({
+    const series = chart.addSeries('Line', {
       color: '#2962FF',
       lineWidth: 2,
     });
@@ -65,7 +65,7 @@ export const MarketChart = () => {
     }).reverse();
 
     setCandleData(sampleData);
-    lineSeries.setData(sampleData);
+    series.setData(sampleData);
     chartRef.current = chart;
 
     // Handle resize
