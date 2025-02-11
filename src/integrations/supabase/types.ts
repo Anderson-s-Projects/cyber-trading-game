@@ -282,6 +282,38 @@ export type Database = {
           },
         ]
       }
+      market_data: {
+        Row: {
+          id: string
+          price: number
+          stock_id: string | null
+          timestamp: string | null
+          volume: number
+        }
+        Insert: {
+          id?: string
+          price: number
+          stock_id?: string | null
+          timestamp?: string | null
+          volume: number
+        }
+        Update: {
+          id?: string
+          price?: number
+          stock_id?: string | null
+          timestamp?: string | null
+          volume?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_data_stock_id_fkey"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nft_attributes: {
         Row: {
           attribute_key: string
@@ -543,6 +575,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stocks: {
+        Row: {
+          company_name: string
+          created_at: string | null
+          id: string
+          market: Database["public"]["Enums"]["stock_market"]
+          sector: Database["public"]["Enums"]["stock_sector"]
+          symbol: string
+          updated_at: string | null
+        }
+        Insert: {
+          company_name: string
+          created_at?: string | null
+          id?: string
+          market: Database["public"]["Enums"]["stock_market"]
+          sector: Database["public"]["Enums"]["stock_sector"]
+          symbol: string
+          updated_at?: string | null
+        }
+        Update: {
+          company_name?: string
+          created_at?: string | null
+          id?: string
+          market?: Database["public"]["Enums"]["stock_market"]
+          sector?: Database["public"]["Enums"]["stock_sector"]
+          symbol?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       task_nft_rewards: {
         Row: {
@@ -1026,6 +1088,16 @@ export type Database = {
         | "crime_syndicate_leader"
         | "market_kingpin"
       career_path: "legitimate" | "criminal"
+      stock_market: "NYSE" | "NASDAQ" | "CRYPTO" | "DARKNET"
+      stock_sector:
+        | "TECHNOLOGY"
+        | "HEALTHCARE"
+        | "FINANCE"
+        | "ENERGY"
+        | "CONSUMER"
+        | "INDUSTRIAL"
+        | "CRYPTO"
+        | "DARKNET"
     }
     CompositeTypes: {
       [_ in never]: never
