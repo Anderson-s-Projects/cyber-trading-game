@@ -46,14 +46,12 @@ export const MarketChart = () => {
       },
     });
 
-    // Create series using the correct method with proper series configuration
-    const series = chart.addBaselineSeries({
-      baseValue: { type: 'price', price: 0 },
+    // Create candlestick series
+    const series = chart.addAreaSeries({
       lineColor: '#2962FF',
+      topColor: 'rgba(41, 98, 255, 0.28)',
+      bottomColor: 'rgba(41, 98, 255, 0.05)',
       lineWidth: 2,
-      topLineColor: 'rgba(41, 98, 255, 0.28)',
-      bottomLineColor: 'rgba(41, 98, 255, 0.05)',
-      lastValueVisible: true,
     });
 
     // Generate some sample data (replace this with real API data)
