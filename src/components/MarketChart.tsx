@@ -46,12 +46,13 @@ export const MarketChart = () => {
       },
     });
 
-    // Create candlestick series
-    const series = chart.addAreaSeries({
-      lineColor: '#2962FF',
-      topColor: 'rgba(41, 98, 255, 0.28)',
-      bottomColor: 'rgba(41, 98, 255, 0.05)',
-      lineWidth: 2,
+    // Create series with the correct method
+    const series = chart.addHistogramSeries({
+      color: '#2962FF',
+      priceFormat: {
+        type: 'price',
+        precision: 2,
+      },
     });
 
     // Generate some sample data (replace this with real API data)
