@@ -7,7 +7,7 @@ export const availableStocks = [
   { symbol: 'NVDA', name: 'NVIDIA Corporation' },
   { symbol: 'META', name: 'Meta Platforms Inc.' },
   { symbol: 'TSLA', name: 'Tesla Inc.' },
-] as const;
+];
 
 export const actions = [
   { icon: 'Plus', label: 'Buy', color: 'text-green-400', action: 'buy' },
@@ -15,3 +15,4 @@ export const actions = [
   { icon: 'Send', label: 'Transfer', color: 'text-neonpink', action: 'transfer' },
   { icon: 'History', label: 'History', color: 'text-purple-400', action: 'history' },
 ] as const;
+
