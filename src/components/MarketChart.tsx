@@ -46,9 +46,13 @@ export const MarketChart = () => {
       },
     });
 
-    // Add candlestick series
-    const candlestickSeries = chart.addCandlestickSeries();
-    
+    // Create candlestick series using the correct method
+    const candlestickSeries = chart.addAreaSeries({
+      lineColor: '#2962FF',
+      topColor: '#2962FF',
+      bottomColor: 'rgba(41, 98, 255, 0.28)',
+    });
+
     // Generate some sample data (replace this with real API data)
     const currentDate = new Date();
     const sampleData = Array.from({ length: 50 }, (_, i) => {
@@ -57,10 +61,7 @@ export const MarketChart = () => {
       const basePrice = 100 + Math.random() * 50;
       return {
         time: date.toISOString().split('T')[0],
-        open: basePrice,
-        high: basePrice + Math.random() * 10,
-        low: basePrice - Math.random() * 10,
-        close: basePrice + (Math.random() - 0.5) * 20,
+        value: basePrice + (Math.random() - 0.5) * 20,
       };
     }).reverse();
 
