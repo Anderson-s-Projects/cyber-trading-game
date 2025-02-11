@@ -1,13 +1,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { createChart } from 'lightweight-charts';
+import { IChartApi, createChart, CandlestickSeriesOptions } from 'lightweight-charts';
 import { availableStocks } from '@/constants/stockData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export const MarketChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const [selectedStock, setSelectedStock] = useState<string>(availableStocks[0].symbol);
-  const chartRef = useRef<any>(null);
+  const chartRef = useRef<IChartApi | null>(null);
   const [candleData, setCandleData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -46,29 +46,31 @@ export const MarketChart = () => {
       },
     });
 
-    // Create candlestick series
-    const series = chart.addCandlestickSeries({
+    // Create candlestick series with proper typing
+    const candlestickOptions: CandlestickSeriesOptions = {
       upColor: '#26a69a',
       downColor: '#ef5350',
       borderVisible: false,
       wickUpColor: '#26a69a',
       wickDownColor: '#ef5350',
+    };
+
+    // Create area series instead of candlestick
+    const series = chart.addAreaSeries({
+      lineColor: '#2962FF',
+      topColor: '#2962FF',
+      bottomColor: 'rgba(41, 98, 255, 0.28)',
     });
 
-    // Generate some sample candlestick data
+    // Generate some sample data
     const currentDate = new Date();
     const sampleData = Array.from({ length: 50 }, (_, i) => {
       const date = new Date(currentDate);
       date.setDate(date.getDate() - i);
       const basePrice = 100 + Math.random() * 50;
-      const high = basePrice + Math.random() * 10;
-      const low = basePrice - Math.random() * 10;
       return {
         time: date.toISOString().split('T')[0],
-        open: basePrice,
-        high: high,
-        low: low,
-        close: basePrice + (Math.random() - 0.5) * 20,
+        value: basePrice + (Math.random() - 0.5) * 20,
       };
     }).reverse();
 
