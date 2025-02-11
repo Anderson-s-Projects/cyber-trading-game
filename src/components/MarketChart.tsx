@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { IChartApi, createChart, CandlestickSeriesOptions } from 'lightweight-charts';
+import { IChartApi, createChart } from 'lightweight-charts';
 import { availableStocks } from '@/constants/stockData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -46,20 +46,13 @@ export const MarketChart = () => {
       },
     });
 
-    // Create candlestick series with proper typing
-    const candlestickOptions: CandlestickSeriesOptions = {
-      upColor: '#26a69a',
-      downColor: '#ef5350',
-      borderVisible: false,
-      wickUpColor: '#26a69a',
-      wickDownColor: '#ef5350',
-    };
-
-    // Create area series instead of candlestick
-    const series = chart.addAreaSeries({
-      lineColor: '#2962FF',
-      topColor: '#2962FF',
-      bottomColor: 'rgba(41, 98, 255, 0.28)',
+    // Create line series using the correct method
+    const series = chart.addLineSeries({
+      color: '#2962FF',
+      lineWidth: 2,
+      crosshairMarkerVisible: true,
+      lastValueVisible: true,
+      priceLineVisible: false,
     });
 
     // Generate some sample data
