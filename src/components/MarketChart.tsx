@@ -46,11 +46,10 @@ export const MarketChart = () => {
       },
     });
 
-    // Create candlestick series using the correct method
-    const candlestickSeries = chart.addAreaSeries({
-      lineColor: '#2962FF',
-      topColor: '#2962FF',
-      bottomColor: 'rgba(41, 98, 255, 0.28)',
+    // Create series using the correct method
+    const lineSeries = chart.addLineSeries({
+      color: '#2962FF',
+      lineWidth: 2,
     });
 
     // Generate some sample data (replace this with real API data)
@@ -66,7 +65,7 @@ export const MarketChart = () => {
     }).reverse();
 
     setCandleData(sampleData);
-    candlestickSeries.setData(sampleData);
+    lineSeries.setData(sampleData);
     chartRef.current = chart;
 
     // Handle resize
