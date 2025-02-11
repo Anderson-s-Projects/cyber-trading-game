@@ -1,13 +1,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { createChart, IChartApi } from 'lightweight-charts';
+import { createChart } from 'lightweight-charts';
 import { availableStocks } from '@/constants/stockData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export const MarketChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const [selectedStock, setSelectedStock] = useState(availableStocks[0].symbol);
-  const chartRef = useRef<IChartApi | null>(null);
+  const [selectedStock, setSelectedStock] = useState<string>(availableStocks[0].symbol);
+  const chartRef = useRef<any>(null);
   const [candleData, setCandleData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -44,22 +44,11 @@ export const MarketChart = () => {
           style: 3,
         },
       },
-      attributionLogo: {
-        background: 'transparent',
-        color: '#00f0ff',
-      },
     });
 
     // Add candlestick series
-    const candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#26a69a',
-      downColor: '#ef5350',
-      borderUpColor: '#26a69a',
-      borderDownColor: '#ef5350',
-      wickUpColor: '#26a69a',
-      wickDownColor: '#ef5350',
-    });
-
+    const candlestickSeries = chart.addCandlestickSeries();
+    
     // Generate some sample data (replace this with real API data)
     const currentDate = new Date();
     const sampleData = Array.from({ length: 50 }, (_, i) => {
