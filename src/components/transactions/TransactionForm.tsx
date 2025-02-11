@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { availableStocks } from '@/constants/stockData';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TransactionFormProps {
-  type: string;
-  onSubmit: (type: string, formData: FormData) => void;
+  type: 'buy' | 'sell' | 'short' | 'cover';
+  onSubmit: (type: 'buy' | 'sell' | 'short' | 'cover', formData: FormData) => void;
 }
 
 export const TransactionForm = ({ type, onSubmit }: TransactionFormProps) => {
@@ -51,14 +51,14 @@ export const TransactionForm = ({ type, onSubmit }: TransactionFormProps) => {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    onSubmit(type, formData);
+  };
+
   return (
-    <form
-      className="space-y-4"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSubmit(type, new FormData(e.currentTarget));
-      }}
-    >
+    <form className="space-y-4" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <label className="text-sm font-medium">Stock Symbol</label>
         <Select
@@ -83,25 +83,36 @@ export const TransactionForm = ({ type, onSubmit }: TransactionFormProps) => {
           readOnly
         />
       </div>
+
       <div className="space-y-2">
-        <label className="text-sm font-medium">Amount</label>
-        <Input name="amount" type="number" placeholder="1.0" required />
+        <label className="text-sm font-medium">Quantity</label>
+        <Input 
+          name="quantity" 
+          type="number" 
+          step="0.01"
+          min="0.01" 
+          placeholder="1.0" 
+          required 
+        />
       </div>
+
       <div className="space-y-2">
         <label className="text-sm font-medium">Price (USD)</label>
         <Input 
-          name="price" 
+          name="price_per_share" 
           type="number" 
+          step="0.01"
+          min="0.01"
           value={currentPrice}
           onChange={(e) => setCurrentPrice(e.target.value)}
           placeholder={isLoading ? "Loading..." : "Price"}
           required 
         />
       </div>
+
       <Button type="submit" className="w-full">
         Confirm {type.charAt(0).toUpperCase() + type.slice(1)}
       </Button>
     </form>
   );
 };
-

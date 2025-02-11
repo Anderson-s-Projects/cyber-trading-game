@@ -1,9 +1,11 @@
 
 export interface Transaction {
-  type: string;
+  id: string;
+  portfolio_id: string;
+  quantity: number;
+  price_per_share: number;
   symbol: string;
-  amount: string;
-  price: string;
-  timestamp: Date;
+  transaction_type: 'buy' | 'sell' | 'short' | 'cover';
+  transaction_date: string;
+  total_amount: number;
 }
-
