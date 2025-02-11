@@ -46,24 +46,29 @@ export const MarketChart = () => {
       },
     });
 
-    // Create series with the correct method
-    const series = chart.addSeries('line', {
-      color: '#00f0ff',
-      lineWidth: 2,
-      crosshairMarkerVisible: true,
-      lastValueVisible: true,
-      priceLineVisible: false,
+    // Create candlestick series
+    const series = chart.addCandlestickSeries({
+      upColor: '#26a69a',
+      downColor: '#ef5350',
+      borderVisible: false,
+      wickUpColor: '#26a69a',
+      wickDownColor: '#ef5350',
     });
 
-    // Generate some sample data (replace this with real API data)
+    // Generate some sample candlestick data
     const currentDate = new Date();
     const sampleData = Array.from({ length: 50 }, (_, i) => {
       const date = new Date(currentDate);
       date.setDate(date.getDate() - i);
       const basePrice = 100 + Math.random() * 50;
+      const high = basePrice + Math.random() * 10;
+      const low = basePrice - Math.random() * 10;
       return {
         time: date.toISOString().split('T')[0],
-        value: basePrice + (Math.random() - 0.5) * 20,
+        open: basePrice,
+        high: high,
+        low: low,
+        close: basePrice + (Math.random() - 0.5) * 20,
       };
     }).reverse();
 
@@ -91,7 +96,6 @@ export const MarketChart = () => {
   const handleStockChange = (value: string) => {
     setSelectedStock(value);
     // Here you would typically fetch new data for the selected stock
-    // For now, we'll just log the selection
     console.log('Selected stock:', value);
   };
 
