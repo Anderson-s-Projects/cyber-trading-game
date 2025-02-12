@@ -6,6 +6,12 @@ import { Progress } from '@/components/ui/progress';
 import { Flame, Trophy, Network, Brain, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+interface CareerProgressionResult {
+  levelUp: boolean;
+  newLevel?: string;
+  unlockedFeatures?: string[];
+}
+
 interface CareerData {
   id: string;
   current_path: 'legitimate' | 'criminal';
@@ -51,9 +57,11 @@ export const CareerStatus = () => {
           throw error;
         }
 
-        if (!careerData) {
+        let currentCareer = careerData;
+
+        if (!currentCareer) {
           // Create new career record if none exists
-          const { data: newCareer, error: createError } = await supabase
+          const { data: newCareerData, error: createError } = await supabase
             .from('user_careers')
             .insert([
               {
@@ -70,14 +78,15 @@ export const CareerStatus = () => {
             .single();
 
           if (createError) throw createError;
-          setCareer(newCareer);
+          currentCareer = newCareerData;
+          setCareer(newCareerData);
           
           toast({
             title: "Career Initialized",
             description: "Welcome to your trading career! Start with some basic trades to build your reputation.",
           });
         } else {
-          setCareer(careerData);
+          setCareer(currentCareer);
           
           // Check for level progression
           const { data: progression, error: progressionError } = await supabase
@@ -85,30 +94,39 @@ export const CareerStatus = () => {
             
           if (progressionError) throw progressionError;
           
-          if (progression?.levelUp) {
+          const progressionResult = progression as CareerProgressionResult;
+          
+          if (progressionResult?.levelUp && progressionResult.newLevel) {
             toast({
               title: "Level Up!",
-              description: `Congratulations! You've advanced to ${progression.newLevel.replace(/_/g, ' ')}!`,
+              description: `Congratulations! You've advanced to ${progressionResult.newLevel.replace(/_/g, ' ')}!`,
             });
-            setCareer(prev => prev ? { ...prev, current_level: progression.newLevel } : null);
+            setCareer(prev => prev ? { ...prev, current_level: progressionResult.newLevel } : null);
           }
         }
 
         // Fetch next level requirements if career exists
-        if (careerData || newCareer) {
+        if (currentCareer) {
           const { data: levelData, error: levelError } = await supabase
             .from('career_level_definitions')
             .select('*')
-            .eq('path', careerData?.current_path || 'legitimate')
-            .gt('required_reputation', careerData?.reputation_score || 0)
+            .eq('path', currentCareer.current_path)
+            .gt('required_reputation', currentCareer.reputation_score)
             .order('required_reputation', { ascending: true })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           if (levelError && levelError.code !== 'PGRST116') {
             console.error('Error fetching next level:', levelError);
-          } else {
-            setNextLevel(levelData);
+          } else if (levelData) {
+            // Ensure unlocked_features is always an array
+            const parsedLevel: CareerLevelDefinition = {
+              ...levelData,
+              unlocked_features: Array.isArray(levelData.unlocked_features) 
+                ? levelData.unlocked_features 
+                : []
+            };
+            setNextLevel(parsedLevel);
           }
         }
       } catch (error) {
@@ -150,12 +168,12 @@ export const CareerStatus = () => {
         <div>
           <h2 className="text-2xl font-bold text-neonCyan">Career Status</h2>
           <div className="text-gray-400 mt-1">
-            {nextLevel?.description || "Maximium level reached"}
+            {nextLevel?.description || "Maximum level reached"}
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xl font-bold capitalize">{career.current_level.replace(/_/g, ' ')}</p>
-          <p className="text-gray-400 capitalize">{career.current_path} Path</p>
+          <p className="text-xl font-bold capitalize">{career?.current_level.replace(/_/g, ' ')}</p>
+          <p className="text-gray-400 capitalize">{career?.current_path} Path</p>
         </div>
       </div>
 
