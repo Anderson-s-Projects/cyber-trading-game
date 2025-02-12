@@ -94,7 +94,8 @@ export const CareerStatus = () => {
             
           if (progressionError) throw progressionError;
           
-          const progressionResult = progression as CareerProgressionResult;
+          // Safely cast the progression data
+          const progressionResult = progression as unknown as CareerProgressionResult;
           
           if (progressionResult?.levelUp && progressionResult.newLevel) {
             toast({
@@ -119,12 +120,15 @@ export const CareerStatus = () => {
           if (levelError && levelError.code !== 'PGRST116') {
             console.error('Error fetching next level:', levelError);
           } else if (levelData) {
-            // Ensure unlocked_features is always an array
+            // Safely convert unlocked_features to string array
+            const features = levelData.unlocked_features;
+            const parsedFeatures = Array.isArray(features) 
+              ? features.map(f => String(f))
+              : [];
+
             const parsedLevel: CareerLevelDefinition = {
               ...levelData,
-              unlocked_features: Array.isArray(levelData.unlocked_features) 
-                ? levelData.unlocked_features 
-                : []
+              unlocked_features: parsedFeatures
             };
             setNextLevel(parsedLevel);
           }
