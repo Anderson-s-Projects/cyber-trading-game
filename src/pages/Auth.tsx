@@ -5,12 +5,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import { UserProfile } from '@/types/auth';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [step, setStep] = useState<'auth' | 'profile'>('auth');
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -27,15 +30,31 @@ const Auth = () => {
         if (error) throw error;
         navigate('/dashboard');
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { error: signUpError, data } = await supabase.auth.signUp({
           email,
           password,
         });
-        if (error) throw error;
-        toast({
-          title: "Success!",
-          description: "Please check your email to verify your account.",
-        });
+        if (signUpError) throw signUpError;
+        
+        if (data.user) {
+          // Create initial profile
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .upsert({
+              id: data.user.id,
+              username,
+              experience_points: 0,
+              level: 1,
+              achievements: []
+            });
+
+          if (profileError) throw profileError;
+
+          toast({
+            title: "Success!",
+            description: "Please check your email to verify your account.",
+          });
+        }
       }
     } catch (error: any) {
       toast({
@@ -78,12 +97,22 @@ const Auth = () => {
               required
               className="bg-background/50"
             />
+            {!isLogin && (
+              <Input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="bg-background/50"
+              />
+            )}
           </div>
 
           <Button
             type="submit"
             className="w-full"
-            disabled={loading}
+            disabled={loading || (!isLogin && !username)}
           >
             {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Sign Up')}
           </Button>
@@ -92,7 +121,10 @@ const Auth = () => {
             type="button"
             variant="ghost"
             className="w-full"
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setUsername('');
+            }}
           >
             {isLogin ? 'Need an account? Sign Up' : 'Already have an account? Sign In'}
           </Button>
