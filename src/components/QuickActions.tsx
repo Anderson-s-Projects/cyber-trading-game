@@ -12,28 +12,32 @@ export const QuickActions = () => {
   const { toast } = useToast();
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
 
-  const handleTransaction = (type: string, formData: FormData) => {
+  const handleTransaction = (transaction_type: 'buy' | 'sell' | 'short' | 'cover', formData: FormData) => {
     const symbol = formData.get('symbol') as string;
-    const amount = formData.get('amount') as string;
-    const price = formData.get('price') as string;
+    const quantity = formData.get('quantity') as string;
+    const price_per_share = formData.get('price_per_share') as string;
+    const total_amount = Number(quantity) * Number(price_per_share);
 
     const newTransaction: Transaction = {
-      type,
+      id: crypto.randomUUID(),
+      portfolio_id: '', // This will need to be set with the actual portfolio ID
+      transaction_type,
       symbol,
-      amount,
-      price,
-      timestamp: new Date(),
+      quantity: Number(quantity),
+      price_per_share: Number(price_per_share),
+      transaction_date: new Date().toISOString(),
+      total_amount
     };
 
     setTransactions(prev => [newTransaction, ...prev]);
     
     toast({
       title: "Transaction Successful",
-      description: `${type.toUpperCase()}: ${amount} ${symbol} @ $${price}`,
+      description: `${transaction_type.toUpperCase()}: ${quantity} ${symbol} @ $${price_per_share}`,
     });
   };
 
-  const renderDialogContent = (type: string) => {
+  const renderDialogContent = (type: 'buy' | 'sell' | 'short' | 'cover' | 'history') => {
     if (type === 'history') {
       return <TransactionHistory transactions={transactions} />;
     }
@@ -76,7 +80,7 @@ export const QuickActions = () => {
                   <span>{label}</span>
                 </DialogTitle>
               </DialogHeader>
-              {renderDialogContent(action)}
+              {renderDialogContent(action as 'buy' | 'sell' | 'short' | 'cover' | 'history')}
             </DialogContent>
           </Dialog>
         )
@@ -84,4 +88,3 @@ export const QuickActions = () => {
     </div>
   );
 };
-
