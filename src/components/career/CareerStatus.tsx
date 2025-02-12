@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Flame, Trophy, Network, Brain } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface CareerData {
   id: string;
@@ -18,30 +19,68 @@ interface CareerData {
 export const CareerStatus = () => {
   const [career, setCareer] = useState<CareerData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const fetchCareerData = async () => {
+    const initializeCareer = async () => {
       try {
+        // Get the current user's ID
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Try to fetch existing career data
         const { data: careerData, error } = await supabase
           .from('user_careers')
           .select('*')
-          .single();
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-        if (error) {
-          console.error('Error fetching career data:', error);
-          return;
+        if (error && error.code !== 'PGRST116') {
+          throw error;
         }
 
-        setCareer(careerData);
+        if (!careerData) {
+          // Create new career record if none exists
+          const { data: newCareer, error: createError } = await supabase
+            .from('user_careers')
+            .insert([
+              {
+                user_id: user.id,
+                current_path: 'legitimate',
+                current_level: 'retail_trader',
+                heat_level: 0,
+                reputation_score: 0,
+                technical_skills: 0,
+                network_size: 0
+              }
+            ])
+            .select('*')
+            .single();
+
+          if (createError) throw createError;
+          setCareer(newCareer);
+          
+          toast({
+            title: "Career Initialized",
+            description: "Welcome to your trading career! Start with some basic trades to build your reputation.",
+          });
+        } else {
+          setCareer(careerData);
+        }
       } catch (error) {
         console.error('Error in career data fetch:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load career data. Please try refreshing the page.",
+          variant: "destructive"
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCareerData();
-  }, []);
+    initializeCareer();
+  }, [toast]);
 
   if (loading) {
     return (
@@ -55,7 +94,7 @@ export const CareerStatus = () => {
     return (
       <Card className="p-6 bg-background/50">
         <div className="text-center text-gray-400">
-          No career data found. Start trading to begin your career!
+          Unable to load career data. Please try refreshing the page.
         </div>
       </Card>
     );
@@ -134,5 +173,4 @@ export const CareerStatus = () => {
   );
 };
 
-// Add a default export as well for better module compatibility
 export default CareerStatus;
