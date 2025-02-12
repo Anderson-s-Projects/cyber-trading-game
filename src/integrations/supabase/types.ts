@@ -75,6 +75,39 @@ export type Database = {
         }
         Relationships: []
       }
+      career_level_definitions: {
+        Row: {
+          description: string
+          id: string
+          level: Database["public"]["Enums"]["career_level"]
+          path: Database["public"]["Enums"]["career_path"]
+          required_network_size: number
+          required_reputation: number
+          required_technical_skills: number
+          unlocked_features: Json | null
+        }
+        Insert: {
+          description: string
+          id?: string
+          level: Database["public"]["Enums"]["career_level"]
+          path: Database["public"]["Enums"]["career_path"]
+          required_network_size?: number
+          required_reputation?: number
+          required_technical_skills?: number
+          unlocked_features?: Json | null
+        }
+        Update: {
+          description?: string
+          id?: string
+          level?: Database["public"]["Enums"]["career_level"]
+          path?: Database["public"]["Enums"]["career_path"]
+          required_network_size?: number
+          required_reputation?: number
+          required_technical_skills?: number
+          unlocked_features?: Json | null
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -1073,7 +1106,12 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      check_career_progression: {
+        Args: {
+          user_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       career_level:
