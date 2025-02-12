@@ -34,7 +34,22 @@ const Auth = () => {
           email,
           password,
         });
-        if (signUpError) throw signUpError;
+
+        // Check for user_already_exists error
+        if (signUpError) {
+          const errorBody = JSON.parse((signUpError as any).body || '{}');
+          if (errorBody.code === 'user_already_exists') {
+            toast({
+              title: "Account Exists",
+              description: "An account with this email already exists. Please sign in instead.",
+              variant: "destructive",
+            });
+            setIsLogin(true); // Switch to login mode
+            setLoading(false);
+            return;
+          }
+          throw signUpError;
+        }
         
         if (data.user) {
           // Create initial profile
