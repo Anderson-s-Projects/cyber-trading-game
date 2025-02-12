@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Flame, Trophy, Network, Brain } from 'lucide-react';
+import { Flame, Trophy, Network, Brain, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface CareerData {
@@ -16,8 +16,20 @@ interface CareerData {
   network_size: number;
 }
 
+interface CareerLevelDefinition {
+  id: string;
+  path: 'legitimate' | 'criminal';
+  level: string;
+  required_reputation: number;
+  required_technical_skills: number;
+  required_network_size: number;
+  description: string;
+  unlocked_features: string[];
+}
+
 export const CareerStatus = () => {
   const [career, setCareer] = useState<CareerData | null>(null);
+  const [nextLevel, setNextLevel] = useState<CareerLevelDefinition | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -66,6 +78,38 @@ export const CareerStatus = () => {
           });
         } else {
           setCareer(careerData);
+          
+          // Check for level progression
+          const { data: progression, error: progressionError } = await supabase
+            .rpc('check_career_progression', { user_id: user.id });
+            
+          if (progressionError) throw progressionError;
+          
+          if (progression?.levelUp) {
+            toast({
+              title: "Level Up!",
+              description: `Congratulations! You've advanced to ${progression.newLevel.replace(/_/g, ' ')}!`,
+            });
+            setCareer(prev => prev ? { ...prev, current_level: progression.newLevel } : null);
+          }
+        }
+
+        // Fetch next level requirements if career exists
+        if (careerData || newCareer) {
+          const { data: levelData, error: levelError } = await supabase
+            .from('career_level_definitions')
+            .select('*')
+            .eq('path', careerData?.current_path || 'legitimate')
+            .gt('required_reputation', careerData?.reputation_score || 0)
+            .order('required_reputation', { ascending: true })
+            .limit(1)
+            .single();
+
+          if (levelError && levelError.code !== 'PGRST116') {
+            console.error('Error fetching next level:', levelError);
+          } else {
+            setNextLevel(levelData);
+          }
         }
       } catch (error) {
         console.error('Error in career data fetch:', error);
@@ -102,17 +146,16 @@ export const CareerStatus = () => {
 
   return (
     <Card className="p-6 bg-background/50">
-      <h2 className="text-2xl font-bold text-neonCyan mb-4">Career Status</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="flex justify-between items-start mb-4">
         <div>
-          <p className="text-gray-400">Current Path</p>
-          <p className="text-xl font-bold capitalize">{career.current_path}</p>
+          <h2 className="text-2xl font-bold text-neonCyan">Career Status</h2>
+          <div className="text-gray-400 mt-1">
+            {nextLevel?.description || "Maximium level reached"}
+          </div>
         </div>
-        <div>
-          <p className="text-gray-400">Current Level</p>
-          <p className="text-xl font-bold capitalize">
-            {career.current_level.replace(/_/g, ' ')}
-          </p>
+        <div className="text-right">
+          <p className="text-xl font-bold capitalize">{career.current_level.replace(/_/g, ' ')}</p>
+          <p className="text-gray-400 capitalize">{career.current_path} Path</p>
         </div>
       </div>
 
@@ -137,9 +180,20 @@ export const CareerStatus = () => {
           <div className="flex-1">
             <div className="flex justify-between mb-1">
               <span className="text-sm text-gray-400">Reputation</span>
-              <span className="text-sm text-gray-400">{career.reputation_score}/1000</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-400">{career.reputation_score}</span>
+                {nextLevel && (
+                  <span className="text-sm text-gray-600">
+                    <ChevronRight className="inline w-4 h-4" />
+                    {nextLevel.required_reputation}
+                  </span>
+                )}
+              </div>
             </div>
-            <Progress value={(career.reputation_score / 1000) * 100} className="bg-background h-2" />
+            <Progress 
+              value={(career.reputation_score / (nextLevel?.required_reputation || 1000)) * 100} 
+              className="bg-background h-2" 
+            />
           </div>
         </div>
 
@@ -150,9 +204,20 @@ export const CareerStatus = () => {
           <div className="flex-1">
             <div className="flex justify-between mb-1">
               <span className="text-sm text-gray-400">Technical Skills</span>
-              <span className="text-sm text-gray-400">{career.technical_skills}%</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-400">{career.technical_skills}</span>
+                {nextLevel && (
+                  <span className="text-sm text-gray-600">
+                    <ChevronRight className="inline w-4 h-4" />
+                    {nextLevel.required_technical_skills}
+                  </span>
+                )}
+              </div>
             </div>
-            <Progress value={career.technical_skills} className="bg-background h-2" />
+            <Progress 
+              value={(career.technical_skills / (nextLevel?.required_technical_skills || 100)) * 100} 
+              className="bg-background h-2" 
+            />
           </div>
         </div>
 
@@ -163,11 +228,39 @@ export const CareerStatus = () => {
           <div className="flex-1">
             <div className="flex justify-between mb-1">
               <span className="text-sm text-gray-400">Network Size</span>
-              <span className="text-sm text-gray-400">{career.network_size}/1000</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-400">{career.network_size}</span>
+                {nextLevel && (
+                  <span className="text-sm text-gray-600">
+                    <ChevronRight className="inline w-4 h-4" />
+                    {nextLevel.required_network_size}
+                  </span>
+                )}
+              </div>
             </div>
-            <Progress value={(career.network_size / 1000) * 100} className="bg-background h-2" />
+            <Progress 
+              value={(career.network_size / (nextLevel?.required_network_size || 1000)) * 100} 
+              className="bg-background h-2" 
+            />
           </div>
         </div>
+
+        {nextLevel && (
+          <div className="mt-6 p-4 border border-gray-800 rounded-lg bg-background/30">
+            <h3 className="text-lg font-semibold mb-2">Next Level: {nextLevel.level.replace(/_/g, ' ')}</h3>
+            <p className="text-gray-400 text-sm">{nextLevel.description}</p>
+            {nextLevel.unlocked_features && nextLevel.unlocked_features.length > 0 && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-400">Unlocks:</p>
+                <ul className="list-disc list-inside text-sm text-gray-500">
+                  {nextLevel.unlocked_features.map((feature: string) => (
+                    <li key={feature}>{feature.replace(/_/g, ' ')}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Card>
   );
