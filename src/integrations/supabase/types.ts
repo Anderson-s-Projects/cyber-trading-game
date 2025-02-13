@@ -873,6 +873,7 @@ export type Database = {
           cash_balance: number | null
           created_at: string | null
           id: string
+          invested_value: number | null
           updated_at: string | null
           user_id: string
         }
@@ -880,6 +881,7 @@ export type Database = {
           cash_balance?: number | null
           created_at?: string | null
           id?: string
+          invested_value?: number | null
           updated_at?: string | null
           user_id: string
         }
@@ -887,6 +889,7 @@ export type Database = {
           cash_balance?: number | null
           created_at?: string | null
           id?: string
+          invested_value?: number | null
           updated_at?: string | null
           user_id?: string
         }
