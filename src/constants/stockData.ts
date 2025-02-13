@@ -15,4 +15,3 @@ export const actions = [
   { icon: 'Send', label: 'Transfer', color: 'text-neonpink', action: 'transfer' },
   { icon: 'History', label: 'History', color: 'text-purple-400', action: 'history' },
 ] as const;
-
