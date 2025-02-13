@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { QuickActions } from '@/components/QuickActions';
 import type { PlayerState } from '@/types/player';
 
 export const Game = () => {
@@ -87,6 +88,8 @@ export const Game = () => {
           </div>
         </CardContent>
       </Card>
+
+      <QuickActions />
     </div>
   );
 };
