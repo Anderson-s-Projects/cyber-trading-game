@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import Tutorial from "./pages/Tutorial";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -53,6 +54,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route
+            path="/tutorial"
+            element={
+              <ProtectedRoute>
+                <Tutorial />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={

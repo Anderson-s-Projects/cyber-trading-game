@@ -1,9 +1,9 @@
 
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { LogOut, Home, User } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Home, LogOut, User, BookOpen } from "lucide-react";
 
 export const NavBar = () => {
   const navigate = useNavigate();
@@ -36,6 +36,10 @@ export const NavBar = () => {
             <Button variant="ghost" size="sm" className="flex items-center" onClick={() => navigate('/dashboard')}>
               <Home className="mr-2 h-4 w-4" />
               Dashboard
+            </Button>
+            <Button variant="ghost" size="sm" className="flex items-center" onClick={() => navigate('/tutorial')}>
+              <BookOpen className="mr-2 h-4 w-4" />
+              Tutorial
             </Button>
             <Button variant="ghost" size="sm" className="flex items-center" onClick={() => navigate('/profile')}>
               <User className="mr-2 h-4 w-4" />
