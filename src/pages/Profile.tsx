@@ -19,11 +19,39 @@ const Profile = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      const { data: profile } = await supabase
+      // Try to fetch existing profile
+      const { data: profile, error } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', error);
+        throw error;
+      }
+
+      // If no profile exists, create one
+      if (!profile) {
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert([{
+            id: user.id,
+            username: user.email?.split('@')[0] || 'Trader',
+            experience_points: 0,
+            level: 1,
+            achievements: []
+          }])
+          .select('*')
+          .single();
+
+        if (createError) {
+          console.error('Error creating profile:', createError);
+          throw createError;
+        }
+
+        return newProfile as UserProfile;
+      }
 
       return profile as UserProfile;
     }
@@ -35,11 +63,35 @@ const Profile = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
-      const { data: portfolio } = await supabase
+      const { data: portfolio, error } = await supabase
         .from('user_portfolios')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching portfolio:', error);
+        throw error;
+      }
+
+      if (!portfolio) {
+        const { data: newPortfolio, error: createError } = await supabase
+          .from('user_portfolios')
+          .insert([{
+            user_id: user.id,
+            cash_balance: 100000,
+            invested_value: 0
+          }])
+          .select('*')
+          .single();
+
+        if (createError) {
+          console.error('Error creating portfolio:', createError);
+          throw createError;
+        }
+
+        return newPortfolio;
+      }
 
       return portfolio;
     }
