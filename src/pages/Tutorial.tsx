@@ -8,21 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Lightbulb, CheckCircle2, PlayCircle, ArrowRight, BookOpen } from 'lucide-react';
-
-interface TutorialStep {
-  id: string;
-  title: string;
-  description: string;
-  step_order: number;
-  category: string;
-  sandbox_enabled: boolean;
-}
-
-interface TutorialProgress {
-  step_id: string;
-  completed_at: string;
-  sandbox_attempts: number;
-}
+import type { TutorialStep, TutorialProgress } from '@/types/tutorial';
 
 const Tutorial = () => {
   const { toast } = useToast();
@@ -58,7 +44,9 @@ const Tutorial = () => {
   });
 
   const currentStep = steps[currentStepIndex];
-  const progressPercentage = (progress.length / steps.length) * 100;
+  const totalSteps = steps.length;
+  const completedSteps = progress.length;
+  const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
 
   const handleCompleteStep = async () => {
     try {
@@ -83,7 +71,7 @@ const Tutorial = () => {
           : "You've learned something new!",
       });
 
-      if (currentStepIndex < steps.length - 1) {
+      if (currentStepIndex < totalSteps - 1) {
         setCurrentStepIndex(curr => curr + 1);
       }
     } catch (error: any) {
@@ -120,7 +108,7 @@ const Tutorial = () => {
           </h1>
           <Progress value={progressPercentage} className="w-full" />
           <p className="text-sm text-gray-400 mt-2">
-            {progress.length} of {steps.length} steps completed
+            {completedSteps} of {totalSteps} steps completed
           </p>
         </div>
 
