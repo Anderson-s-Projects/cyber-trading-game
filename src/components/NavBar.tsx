@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Home, LogOut, User, BookOpen } from "lucide-react";
+import { Home, LogOut, User, BookOpen, Newspaper, Settings } from "lucide-react";
 
 export const NavBar = () => {
   const navigate = useNavigate();
@@ -41,9 +41,17 @@ export const NavBar = () => {
               <BookOpen className="mr-2 h-4 w-4" />
               Tutorial
             </Button>
+            <Button variant="ghost" size="sm" className="flex items-center" onClick={() => navigate('/news')}>
+              <Newspaper className="mr-2 h-4 w-4" />
+              News
+            </Button>
             <Button variant="ghost" size="sm" className="flex items-center" onClick={() => navigate('/profile')}>
               <User className="mr-2 h-4 w-4" />
               Profile
+            </Button>
+            <Button variant="ghost" size="sm" className="flex items-center" onClick={() => navigate('/settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
             </Button>
           </div>
         </div>
