@@ -22,7 +22,7 @@ export const PortfolioCard = () => {
           .from('user_portfolios')
           .select('cash_balance, invested_value')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching portfolio:', error);
@@ -35,6 +35,21 @@ export const PortfolioCard = () => {
             cashBalance: portfolio.cash_balance,
             investedValue: portfolio.invested_value || 0
           }));
+        } else {
+          // If no portfolio exists, create one
+          const { error: createError } = await supabase
+            .from('user_portfolios')
+            .insert([
+              { 
+                user_id: user.id,
+                cash_balance: 100000,
+                invested_value: 0
+              }
+            ]);
+
+          if (createError) {
+            console.error('Error creating portfolio:', createError);
+          }
         }
       } catch (error) {
         console.error('Error in portfolio fetch:', error);
