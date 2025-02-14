@@ -747,6 +747,36 @@ export type Database = {
         }
         Relationships: []
       }
+      tutorial_steps: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          sandbox_enabled: boolean | null
+          step_order: number
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          sandbox_enabled?: boolean | null
+          step_order: number
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          sandbox_enabled?: boolean | null
+          step_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achieved_at: string
@@ -960,6 +990,35 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_tutorial_progress: {
+        Row: {
+          completed_at: string | null
+          sandbox_attempts: number | null
+          step_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          sandbox_attempts?: number | null
+          step_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          sandbox_attempts?: number | null
+          step_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_tutorial_progress_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "tutorial_steps"
             referencedColumns: ["id"]
           },
         ]
