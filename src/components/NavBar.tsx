@@ -37,7 +37,7 @@ export const NavBar = () => {
               <Home className="mr-2 h-4 w-4" />
               Dashboard
             </Button>
-            <Button variant="ghost" size="sm" className="flex items-center">
+            <Button variant="ghost" size="sm" className="flex items-center" onClick={() => navigate('/profile')}>
               <User className="mr-2 h-4 w-4" />
               Profile
             </Button>
