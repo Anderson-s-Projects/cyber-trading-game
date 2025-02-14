@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowUpRight, Briefcase, Award, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { UserProfile } from '@/types/auth';
+import type { Transaction } from '@/types/transaction';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ const Profile = () => {
         .eq('id', user.id)
         .single();
 
-      return profile;
+      return profile as UserProfile;
     }
   });
 
@@ -54,7 +56,10 @@ const Profile = () => {
         .eq('portfolio_id', portfolio.id)
         .order('transaction_date', { ascending: false });
 
-      return data || [];
+      return (data || []).map(tx => ({
+        ...tx,
+        transaction_type: tx.transaction_type as Transaction['transaction_type']
+      })) as Transaction[];
     },
     enabled: !!portfolio?.id
   });
@@ -97,7 +102,7 @@ const Profile = () => {
               Achievements
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {userProfile?.achievements?.map((achievement: any, index: number) => (
+              {(userProfile?.achievements as Array<{ name: string; description: string }> || []).map((achievement, index) => (
                 <div key={index} className="p-4 rounded-lg bg-background/40">
                   <h4 className="font-bold">{achievement.name}</h4>
                   <p className="text-sm text-gray-400">{achievement.description}</p>
