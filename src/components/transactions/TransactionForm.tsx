@@ -3,9 +3,9 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { availableStocks } from '@/constants/stockData';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 interface TransactionFormProps {
   type: 'buy' | 'sell' | 'short' | 'cover';
@@ -18,17 +18,33 @@ export const TransactionForm = ({ type, onSubmit }: TransactionFormProps) => {
   const [currentPrice, setCurrentPrice] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const fetchStockPrice = async (symbol: string) => {
+  // Fetch available stocks from stock_market_data
+  const { data: availableStocks } = useQuery({
+    queryKey: ['availableStocks'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('stock_market_data')
+        .select('ticker, company_name, close_price')
+        .order('ticker');
+
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const fetchStockPrice = async (ticker: string) => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase.functions.invoke('get-stock-price', {
-        body: { symbol }
-      });
+      const { data, error } = await supabase
+        .from('stock_market_data')
+        .select('close_price')
+        .eq('ticker', ticker)
+        .single();
 
       if (error) throw error;
       
-      if (data.price) {
-        setCurrentPrice(data.price.toFixed(2));
+      if (data?.close_price) {
+        setCurrentPrice(data.close_price.toString());
       }
     } catch (error) {
       console.error('Error fetching stock price:', error);
@@ -69,9 +85,9 @@ export const TransactionForm = ({ type, onSubmit }: TransactionFormProps) => {
             <SelectValue placeholder="Select a stock" />
           </SelectTrigger>
           <SelectContent>
-            {availableStocks.map((stock) => (
-              <SelectItem key={stock.symbol} value={stock.symbol}>
-                {stock.symbol} - {stock.name}
+            {availableStocks?.map((stock) => (
+              <SelectItem key={stock.ticker} value={stock.ticker}>
+                {stock.ticker} - {stock.company_name}
               </SelectItem>
             ))}
           </SelectContent>

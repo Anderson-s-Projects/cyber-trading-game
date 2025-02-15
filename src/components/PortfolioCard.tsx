@@ -1,66 +1,54 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ArrowUpRight, ArrowDownRight, Briefcase } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 export const PortfolioCard = () => {
-  const [portfolioData, setPortfolioData] = useState({
-    cashBalance: 100000, // Default starting cash
-    investedValue: 0,
-    dayChange: 0,
-    dayChangePercent: 0
+  const { data: portfolioData, refetch } = useQuery({
+    queryKey: ['portfolioData'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const { data: portfolio, error } = await supabase
+        .from('user_portfolios')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      return portfolio || { cash_balance: 100000, invested_value: 0 };
+    }
   });
 
   useEffect(() => {
-    const fetchPortfolioData = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        // Fetch user's portfolio data
-        const { data: portfolio, error } = await supabase
-          .from('user_portfolios')
-          .select('cash_balance, invested_value')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching portfolio:', error);
-          return;
+    // Subscribe to real-time updates on stock_transactions
+    const channel = supabase
+      .channel('stock-transactions')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'stock_transactions'
+        },
+        () => {
+          // Refetch portfolio data when new transactions occur
+          refetch();
         }
+      )
+      .subscribe();
 
-        if (portfolio) {
-          setPortfolioData(prev => ({
-            ...prev,
-            cashBalance: portfolio.cash_balance,
-            investedValue: portfolio.invested_value || 0
-          }));
-        } else {
-          // If no portfolio exists, create one
-          const { error: createError } = await supabase
-            .from('user_portfolios')
-            .insert([
-              { 
-                user_id: user.id,
-                cash_balance: 100000,
-                invested_value: 0
-              }
-            ]);
-
-          if (createError) {
-            console.error('Error creating portfolio:', createError);
-          }
-        }
-      } catch (error) {
-        console.error('Error in portfolio fetch:', error);
-      }
+    return () => {
+      supabase.removeChannel(channel);
     };
+  }, [refetch]);
 
-    fetchPortfolioData();
-  }, []);
-
-  const totalValue = portfolioData.cashBalance + portfolioData.investedValue;
-  const isPositiveDay = portfolioData.dayChange >= 0;
+  const totalValue = (portfolioData?.cash_balance || 0) + (portfolioData?.invested_value || 0);
+  const dayChange = 0; // This would need to be calculated based on previous day's value
+  const dayChangePercent = 0; // This would need to be calculated based on previous day's value
+  const isPositiveDay = dayChange >= 0;
 
   return (
     <div className="cyber-card">
@@ -69,7 +57,7 @@ export const PortfolioCard = () => {
           <Briefcase className="text-neonblue" />
           <h3 className="text-xl font-grotesk">Portfolio</h3>
         </div>
-        <span className="text-cybersilver text-sm">Updated 2m ago</span>
+        <span className="text-cybersilver text-sm">Updated just now</span>
       </div>
       
       <div className="grid grid-cols-2 gap-4">
@@ -83,10 +71,10 @@ export const PortfolioCard = () => {
             </div>
           </div>
           <p className="text-sm text-cybersilver mt-2">
-            Cash: ${portfolioData.cashBalance.toLocaleString()}
+            Cash: ${portfolioData?.cash_balance.toLocaleString()}
           </p>
           <p className="text-sm text-cybersilver">
-            Invested: ${portfolioData.investedValue.toLocaleString()}
+            Invested: ${portfolioData?.invested_value.toLocaleString()}
           </p>
         </div>
         
@@ -94,11 +82,11 @@ export const PortfolioCard = () => {
           <p className="text-cybersilver mb-1">Today's Change</p>
           <div className="flex items-center gap-2">
             <span className="text-2xl font-bold">
-              {isPositiveDay ? '+' : ''}{portfolioData.dayChange.toLocaleString()}
+              {isPositiveDay ? '+' : ''}{dayChange.toLocaleString()}
             </span>
             <div className={`flex items-center ${isPositiveDay ? 'text-green-400' : 'text-red-400'}`}>
               {isPositiveDay ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-              <span className="text-sm">{portfolioData.dayChangePercent.toFixed(1)}%</span>
+              <span className="text-sm">{dayChangePercent.toFixed(1)}%</span>
             </div>
           </div>
         </div>

@@ -568,6 +568,48 @@ export type Database = {
           },
         ]
       }
+      stock_market_data: {
+        Row: {
+          close_price: number
+          company_name: string
+          created_at: string | null
+          date: string
+          high_price: number
+          id: string
+          low_price: number
+          open_price: number
+          ticker: string
+          updated_at: string | null
+          volume: number
+        }
+        Insert: {
+          close_price: number
+          company_name: string
+          created_at?: string | null
+          date: string
+          high_price: number
+          id?: string
+          low_price: number
+          open_price: number
+          ticker: string
+          updated_at?: string | null
+          volume: number
+        }
+        Update: {
+          close_price?: number
+          company_name?: string
+          created_at?: string | null
+          date?: string
+          high_price?: number
+          id?: string
+          low_price?: number
+          open_price?: number
+          ticker?: string
+          updated_at?: string | null
+          volume?: number
+        }
+        Relationships: []
+      }
       stock_transactions: {
         Row: {
           id: string
