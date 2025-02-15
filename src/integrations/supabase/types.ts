@@ -456,6 +456,44 @@ export type Database = {
           },
         ]
       }
+      portfolio_holdings: {
+        Row: {
+          created_at: string
+          id: string
+          portfolio_id: string | null
+          symbol: string
+          total_invested: number
+          total_shares: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          portfolio_id?: string | null
+          symbol: string
+          total_invested?: number
+          total_shares?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          portfolio_id?: string | null
+          symbol?: string
+          total_invested?: number
+          total_shares?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_holdings_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "user_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_members: {
         Row: {
           project_id: string
@@ -1191,23 +1229,7 @@ export type Database = {
       }
     }
     Views: {
-      portfolio_holdings: {
-        Row: {
-          portfolio_id: string | null
-          symbol: string | null
-          total_invested: number | null
-          total_shares: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "stock_transactions_portfolio_id_fkey"
-            columns: ["portfolio_id"]
-            isOneToOne: false
-            referencedRelation: "user_portfolios"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       check_career_progression: {
