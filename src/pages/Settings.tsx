@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavBar } from '@/components/NavBar';
 import { Card } from '@/components/ui/card';
@@ -53,19 +52,15 @@ const Settings = () => {
               <h2 className="text-xl font-bold">Profile Settings</h2>
             </div>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
                   <Input id="username" defaultValue={profile?.username} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue={profile?.email} />
+                  <Label htmlFor="avatar">Avatar URL</Label>
+                  <Input id="avatar" defaultValue={profile?.avatar_url} />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Input id="bio" defaultValue={profile?.bio} />
               </div>
             </div>
           </Card>

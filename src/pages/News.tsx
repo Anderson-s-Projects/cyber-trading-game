@@ -13,7 +13,12 @@ const News = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('market_data')
-        .select('*')
+        .select(`
+          *,
+          stocks:stock_id (
+            symbol
+          )
+        `)
         .order('timestamp', { ascending: false })
         .limit(5);
 
@@ -66,7 +71,7 @@ const News = () => {
               {marketUpdates?.map((update, index) => (
                 <div key={index} className="p-3 border border-white/10 rounded-lg">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium">{update.symbol}</span>
+                    <span className="font-medium">{update.stocks?.symbol}</span>
                     <span className={update.price > 0 ? 'text-green-400' : 'text-red-400'}>
                       ${update.price}
                     </span>
